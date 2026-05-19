@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="id" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Belajar Mengenal Bunga</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&amp;family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+  <style>
+        * { -webkit-tap-highlight-color: transparent; user-select: none; }
+        body { font-family: 'Nunito', sans-serif; overflow: hidden; }
+        .font-bubble { font-family: 'Bubblegum Sans', cursive; }
+        
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+        @keyframes sway { 0%,100%{transform:rotate(-3deg)} 50%{transform:rotate(3deg)} }
+        @keyframes butterfly { 0%{transform:translate(0,0) rotate(0deg)} 25%{transform:translate(60px,-30px) rotate(5deg)} 50%{transform:translate(120px,0) rotate(-5deg)} 75%{transform:translate(60px,30px) rotate(3deg)} 100%{transform:translate(0,0) rotate(0deg)} }
+        @keyframes bloom { 0%{transform:scale(0) rotate(-180deg);opacity:0} 100%{transform:scale(1) rotate(0deg);opacity:1} }
+        @keyframes sparkle { 0%,100%{opacity:0;transform:scale(0)} 50%{opacity:1;transform:scale(1)} }
+        @keyframes cloud { 0%{transform:translateX(-100%)} 100%{transform:translateX(calc(100% + 200px))} }
+        @keyframes bounce-in { 0%{transform:scale(0)} 50%{transform:scale(1.2)} 100%{transform:scale(1)} }
+        @keyframes confetti { 0%{transform:translateY(0) rotate(0deg);opacity:1} 100%{transform:translateY(300px) rotate(720deg);opacity:0} }
+        @keyframes pulse-glow { 0%,100%{box-shadow:0 0 10px rgba(255,200,0,0.5)} 50%{box-shadow:0 0 30px rgba(255,200,0,0.9)} }
+        @keyframes wing { 0%,100%{transform:scaleX(1)} 50%{transform:scaleX(0.3)} }
+        
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        .animate-sway { animation: sway 2s ease-in-out infinite; }
+        .animate-butterfly { animation: butterfly 8s ease-in-out infinite; }
+        .animate-bloom { animation: bloom 1s ease-out forwards; }
+        .animate-sparkle { animation: sparkle 1.5s ease-in-out infinite; }
+        .animate-cloud { animation: cloud 20s linear infinite; }
+        .animate-bounce-in { animation: bounce-in 0.5s ease-out; }
+        .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+        .animate-wing { animation: wing 0.3s ease-in-out infinite; }
+        
+        .btn-kid { 
+            border-radius: 25px; padding: 16px 32px; font-size: 1.3rem; font-weight: 800;
+            box-shadow: 0 6px 0 rgba(0,0,0,0.2); transition: all 0.1s;
+            border: 3px solid rgba(255,255,255,0.5);
+        }
+        .btn-kid:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,0.2); }
+        
+        .page { display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; overflow-y: auto; overflow-x: hidden; }
+        .page.active { display: flex; }
+        
+        .card-menu {
+            border-radius: 20px; padding: 20px; text-align: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15); transition: transform 0.2s;
+            border: 3px solid rgba(255,255,255,0.6);
+        }
+        .card-menu:active { transform: scale(0.95); }
+        
+        .flower-svg { width: 80px; height: 80px; }
+        
+        .drag-item { touch-action: none; cursor: grab; }
+        .drag-item:active { cursor: grabbing; }
+        
+        .star-reward { color: #FFD700; font-size: 2rem; }
+        
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,150,200,0.6); border-radius: 10px; }
+    </style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full">
+  <div id="app" class="w-full h-full relative overflow-hidden" style="background: linear-gradient(180deg, #87CEEB 0%, #98FB98 70%, #228B22 100%);"><!-- Menu Button on Splash Screen --> <button id="splash-menu-btn" onclick="playClick();showPage('page-menu')" class="absolute top-4 right-4 z-40 bg-white/85 hover:bg-white rounded-full p-3 shadow-lg transition-all" style="display:none"> <i data-lucide="menu" class="w-7 h-7 text-green-600"></i> </button> <!-- Animated Background Elements -->
+   <div id="bg-elements" class="absolute inset-0 pointer-events-none overflow-hidden">
+    <div class="animate-cloud absolute top-[8%] opacity-80" style="animation-duration:25s">
+     <svg width="100" height="50" viewbox="0 0 100 50"><ellipse cx="50" cy="30" rx="40" ry="20" fill="white" /><ellipse cx="30" cy="25" rx="25" ry="18" fill="white" /><ellipse cx="70" cy="28" rx="22" ry="15" fill="white" />
+     </svg>
+    </div>
+    <div class="animate-cloud absolute top-[15%] opacity-60" style="animation-duration:35s;animation-delay:5s">
+     <svg width="80" height="40" viewbox="0 0 80 40"><ellipse cx="40" cy="22" rx="35" ry="16" fill="white" /><ellipse cx="25" cy="20" rx="20" ry="14" fill="white" />
+     </svg>
+    </div><!-- Sun -->
+    <div class="absolute top-[3%] right-[5%] animate-float">
+     <svg width="70" height="70" viewbox="0 0 70 70">
+      <circle cx="35" cy="35" r="20" fill="#FFD700" /> <circle cx="28" cy="30" r="3" fill="#333" /><circle cx="42" cy="30" r="3" fill="#333" /> <path d="M28 42 Q35 48 42 42" stroke="#333" stroke-width="2" fill="none" /> <g stroke="#FFD700" stroke-width="3">
+       <line x1="35" y1="5" x2="35" y2="12" />
+       <line x1="35" y1="58" x2="35" y2="65" />
+       <line x1="5" y1="35" x2="12" y2="35" />
+       <line x1="58" y1="35" x2="65" y2="35" />
+       <line x1="14" y1="14" x2="19" y2="19" />
+       <line x1="51" y1="51" x2="56" y2="56" />
+       <line x1="56" y1="14" x2="51" y2="19" />
+       <line x1="19" y1="51" x2="14" y2="56" />
+      </g>
+     </svg>
+    </div><!-- Butterflies -->
+    <div class="animate-butterfly absolute top-[20%] left-[10%]" style="animation-duration:10s">
+     <svg width="30" height="24" viewbox="0 0 30 24"><ellipse class="animate-wing" cx="9" cy="10" rx="8" ry="10" fill="#FF69B4" opacity="0.8" /><ellipse class="animate-wing" cx="21" cy="10" rx="8" ry="10" fill="#FF69B4" opacity="0.8" /><rect x="14" y="2" width="2" height="20" rx="1" fill="#333" />
+     </svg>
+    </div>
+    <div class="animate-butterfly absolute top-[40%] left-[60%]" style="animation-duration:12s;animation-delay:3s">
+     <svg width="25" height="20" viewbox="0 0 30 24"><ellipse class="animate-wing" cx="9" cy="10" rx="8" ry="10" fill="#9B59B6" opacity="0.8" /><ellipse class="animate-wing" cx="21" cy="10" rx="8" ry="10" fill="#9B59B6" opacity="0.8" /><rect x="14" y="2" width="2" height="20" rx="1" fill="#333" />
+     </svg>
+    </div>
+   </div><!-- PAGE: Splash/Opening -->
+   <div id="page-splash" class="page active flex-col items-center justify-center relative z-10">
+    <div class="text-center animate-bounce-in">
+     <div class="animate-bloom mb-4">
+      <svg width="120" height="120" viewbox="0 0 120 120" class="mx-auto">
+       <circle cx="60" cy="60" r="15" fill="#FFD700" /> <ellipse cx="60" cy="30" rx="12" ry="20" fill="#FF69B4" /><ellipse cx="60" cy="90" rx="12" ry="20" fill="#FF69B4" /> <ellipse cx="30" cy="60" rx="20" ry="12" fill="#FF1493" /><ellipse cx="90" cy="60" rx="20" ry="12" fill="#FF1493" /> <ellipse cx="39" cy="39" rx="12" ry="20" fill="#FF85C0" transform="rotate(-45 39 39)" /><ellipse cx="81" cy="39" rx="12" ry="20" fill="#FF85C0" transform="rotate(45 81 39)" /> <ellipse cx="39" cy="81" rx="12" ry="20" fill="#FF85C0" transform="rotate(45 39 81)" /><ellipse cx="81" cy="81" rx="12" ry="20" fill="#FF85C0" transform="rotate(-45 81 81)" />
+      </svg>
+     </div>
+     <h1 id="main-title" class="font-bubble text-4xl md:text-6xl text-white drop-shadow-lg mb-2" style="text-shadow: 3px 3px 0 #E91E63">Belajar Mengenal Bunga</h1>
+     <p id="subtitle-text" class="text-xl md:text-2xl text-yellow-100 font-bold mb-8">Petualangan Seru di Taman Bunga! 🌸</p><button onclick="playClick();showPage('page-menu')" class="btn-kid bg-gradient-to-r from-pink-400 to-purple-500 text-white animate-pulse-glow text-2xl"> 🌺 Mulai Belajar 🌺 </button>
+    </div><!-- Ground flowers -->
+    <div class="absolute bottom-0 left-0 right-0 flex justify-around items-end pb-4">
+     <div class="animate-sway">
+      <svg width="40" height="60" viewbox="0 0 40 60"><rect x="18" y="30" width="4" height="30" fill="#228B22" /><circle cx="20" cy="22" r="14" fill="#FF6B6B" /><circle cx="20" cy="22" r="6" fill="#FFD700" />
+      </svg>
+     </div>
+     <div class="animate-sway" style="animation-delay:0.5s">
+      <svg width="40" height="50" viewbox="0 0 40 60"><rect x="18" y="30" width="4" height="30" fill="#228B22" /><circle cx="20" cy="22" r="12" fill="#FFEB3B" /><circle cx="20" cy="22" r="5" fill="#8B4513" />
+      </svg>
+     </div>
+     <div class="animate-sway" style="animation-delay:1s">
+      <svg width="40" height="55" viewbox="0 0 40 60"><rect x="18" y="30" width="4" height="30" fill="#228B22" /><circle cx="20" cy="22" r="13" fill="#E040FB" /><circle cx="20" cy="22" r="5" fill="#FFD700" />
+      </svg>
+     </div>
+     <div class="animate-sway" style="animation-delay:0.3s">
+      <svg width="40" height="45" viewbox="0 0 40 60"><rect x="18" y="35" width="4" height="25" fill="#228B22" /><circle cx="20" cy="26" r="11" fill="#FF9800" /><circle cx="20" cy="26" r="4" fill="#5D4037" />
+      </svg>
+     </div>
+     <div class="animate-sway" style="animation-delay:0.8s">
+      <svg width="40" height="60" viewbox="0 0 40 60"><rect x="18" y="30" width="4" height="30" fill="#228B22" /><circle cx="20" cy="22" r="14" fill="#E91E63" /><circle cx="20" cy="22" r="6" fill="#FFF" />
+      </svg>
+     </div>
+    </div>
+   </div><!-- PAGE: Menu -->
+   <div id="page-menu" class="page flex-col items-center p-4 pt-16 relative z-10">
+    <button onclick="playClick();showPage('page-splash')" class="absolute top-3 left-3 bg-white/80 rounded-full p-2 shadow-lg"><i data-lucide="home" class="w-6 h-6 text-green-600"></i></button>
+    <h2 class="font-bubble text-3xl md:text-4xl text-white drop-shadow-lg mb-6">Menu Belajar 📚</h2>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-w-4xl w-full pb-8">
+     <div onclick="playClick();showPage('page-jenis')" class="card-menu bg-gradient-to-br from-pink-300 to-pink-500 cursor-pointer">
+      <div class="text-4xl mb-2">
+       🌹
+      </div>
+      <p class="text-white font-bold text-sm md:text-base">Jenis Bunga</p>
+     </div>
+     <div onclick="playClick();showPage('page-warna')" class="card-menu bg-gradient-to-br from-yellow-300 to-orange-400 cursor-pointer">
+      <div class="text-4xl mb-2">
+       🎨
+      </div>
+      <p class="text-white font-bold text-sm md:text-base">Warna Bunga</p>
+     </div>
+     <div onclick="playClick();showPage('page-bagian')" class="card-menu bg-gradient-to-br from-green-300 to-green-500 cursor-pointer">
+      <div class="text-4xl mb-2">
+       🌱
+      </div>
+      <p class="text-white font-bold text-sm md:text-base">Bagian Bunga</p>
+     </div>
+     <div onclick="playClick();showPage('page-rawat')" class="card-menu bg-gradient-to-br from-blue-300 to-blue-500 cursor-pointer">
+      <div class="text-4xl mb-2">
+       💧
+      </div>
+      <p class="text-white font-bold text-sm md:text-base">Merawat Tanaman</p>
+     </div>
+     <div onclick="playClick();showPage('page-game')" class="card-menu bg-gradient-to-br from-purple-300 to-purple-500 cursor-pointer">
+      <div class="text-4xl mb-2">
+       🎮
+      </div>
+      <p class="text-white font-bold text-sm md:text-base">Game Edukasi</p>
+     </div>
+     <div onclick="playClick();showPage('page-lagu')" class="card-menu bg-gradient-to-br from-red-300 to-red-400 cursor-pointer">
+      <div class="text-4xl mb-2">
+       🎵
+      </div>
+      <p class="text-white font-bold text-sm md:text-base">Lagu Anak</p>
+     </div>
+     <div onclick="playClick();showPage('page-video')" class="card-menu bg-gradient-to-br from-indigo-300 to-indigo-500 cursor-pointer">
+      <div class="text-4xl mb-2">
+       📺
+      </div>
+      <p class="text-white font-bold text-sm md:text-base">Video</p>
+     </div>
+     <div onclick="playClick();showPage('page-profil')" class="card-menu bg-gradient-to-br from-teal-300 to-teal-500 cursor-pointer">
+      <div class="text-4xl mb-2">
+       👩‍🏫
+      </div>
+      <p class="text-white font-bold text-sm md:text-base">Profil Guru</p>
+     </div>
+    </div>
+   </div><!-- PAGE: Jenis Bunga -->
+   <div id="page-jenis" class="page flex-col items-center p-4 pt-16 relative z-10">
+    <button onclick="playClick();showPage('page-menu')" class="absolute top-3 left-3 bg-white/80 rounded-full p-2 shadow-lg"><i data-lucide="arrow-left" class="w-6 h-6 text-green-600"></i></button>
+    <h2 class="font-bubble text-2xl md:text-4xl text-white drop-shadow-lg mb-4">Jenis-Jenis Bunga 🌸</h2>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-3xl w-full pb-8">
+     <div onclick="playClick();showFlower('Mawar','🌹','Bunga mawar berwarna merah dan harum sekali!')" class="card-menu bg-white/90 cursor-pointer animate-sway" style="animation-duration:3s">
+      <div class="text-5xl mb-2">
+       🌹
+      </div>
+      <p class="font-bold text-pink-600 text-lg">Mawar</p>
+     </div>
+     <div onclick="playClick();showFlower('Melati','🤍','Bunga melati berwarna putih dan wangi!')" class="card-menu bg-white/90 cursor-pointer animate-sway" style="animation-duration:3.2s">
+      <div class="text-5xl mb-2">
+       ⚪
+      </div>
+      <p class="font-bold text-green-600 text-lg">Melati</p>
+     </div>
+     <div onclick="playClick();showFlower('Matahari','🌻','Bunga matahari sangat besar dan berwarna kuning!')" class="card-menu bg-white/90 cursor-pointer animate-sway" style="animation-duration:2.8s">
+      <div class="text-5xl mb-2">
+       🌻
+      </div>
+      <p class="font-bold text-yellow-600 text-lg">Matahari</p>
+     </div>
+     <div onclick="playClick();showFlower('Anggrek','🪻','Bunga anggrek sangat cantik dan banyak jenisnya!')" class="card-menu bg-white/90 cursor-pointer animate-sway" style="animation-duration:3.5s">
+      <div class="text-5xl mb-2">
+       🪻
+      </div>
+      <p class="font-bold text-purple-600 text-lg">Anggrek</p>
+     </div>
+     <div onclick="playClick();showFlower('Tulip','🌷','Bunga tulip berasal dari negeri Belanda!')" class="card-menu bg-white/90 cursor-pointer animate-sway" style="animation-duration:2.9s">
+      <div class="text-5xl mb-2">
+       🌷
+      </div>
+      <p class="font-bold text-red-500 text-lg">Tulip</p>
+     </div>
+     <div onclick="playClick();showFlower('Teratai','🪷','Bunga teratai tumbuh di atas air!')" class="card-menu bg-white/90 cursor-pointer animate-sway" style="animation-duration:3.3s">
+      <div class="text-5xl mb-2">
+       🪷
+      </div>
+      <p class="font-bold text-pink-500 text-lg">Teratai</p>
+     </div>
+    </div><!-- Flower detail modal -->
+    <div id="flower-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onclick="this.classList.add('hidden')">
+     <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center animate-bounce-in" onclick="event.stopPropagation()">
+      <div id="flower-emoji" class="text-7xl mb-4 animate-sway"></div>
+      <h3 id="flower-name" class="font-bubble text-3xl text-pink-600 mb-2"></h3>
+      <p id="flower-desc" class="text-gray-600 text-lg mb-4"></p><button onclick="playClick();document.getElementById('flower-modal').classList.add('hidden')" class="btn-kid bg-green-400 text-white text-lg">Kembali ✨</button>
+     </div>
+    </div>
+   </div><!-- PAGE: Warna Bunga -->
+   <div id="page-warna" class="page flex-col items-center p-4 pt-16 relative z-10">
+    <button onclick="playClick();showPage('page-menu')" class="absolute top-3 left-3 bg-white/80 rounded-full p-2 shadow-lg"><i data-lucide="arrow-left" class="w-6 h-6 text-green-600"></i></button>
+    <h2 class="font-bubble text-2xl md:text-4xl text-white drop-shadow-lg mb-4">Warna-Warna Bunga 🎨</h2>
+    <p class="text-white text-lg mb-4 font-bold">Sentuh bunga yang sesuai warnanya!</p>
+    <div id="warna-game" class="bg-white/90 rounded-3xl p-6 max-w-lg w-full text-center">
+     <p class="text-xl font-bold mb-4">Mana bunga berwarna <span id="target-color" class="text-2xl font-bubble"></span>?</p>
+     <div id="warna-options" class="grid grid-cols-3 gap-4 mb-4"></div>
+     <div id="warna-feedback" class="text-2xl font-bold min-h-[40px]"></div>
+     <p class="mt-2">Skor: <span id="warna-score">0</span> ⭐</p>
+    </div>
+   </div><!-- PAGE: Bagian Bunga -->
+   <div id="page-bagian" class="page flex-col items-center p-4 pt-16 relative z-10">
+    <button onclick="playClick();showPage('page-menu')" class="absolute top-3 left-3 bg-white/80 rounded-full p-2 shadow-lg"><i data-lucide="arrow-left" class="w-6 h-6 text-green-600"></i></button>
+    <h2 class="font-bubble text-2xl md:text-4xl text-white drop-shadow-lg mb-4">Bagian-Bagian Bunga 🌱</h2>
+    <div class="bg-white/90 rounded-3xl p-6 max-w-lg w-full">
+     <div class="relative mx-auto" style="width:200px;height:280px">
+      <svg width="200" height="280" viewbox="0 0 200 280">
+       <!-- Roots --> <g id="part-akar" onclick="playClick();showPart('Akar','Akar menyerap air dan nutrisi dari tanah 🌍')" class="cursor-pointer">
+        <path d="M100 250 Q80 260 70 270" stroke="#8B4513" stroke-width="3" fill="none" />
+        <path d="M100 250 Q110 265 120 275" stroke="#8B4513" stroke-width="3" fill="none" />
+        <path d="M100 250 Q95 268 90 278" stroke="#8B4513" stroke-width="2" fill="none" />
+       </g> <!-- Stem --> <g id="part-batang" onclick="playClick();showPart('Batang','Batang menopang bunga berdiri tegak 🌿')" class="cursor-pointer">
+        <rect x="96" y="130" width="8" height="120" rx="4" fill="#228B22" />
+       </g> <!-- Leaves --> <g id="part-daun" onclick="playClick();showPart('Daun','Daun membantu tanaman bernafas 🍃')" class="cursor-pointer">
+        <ellipse cx="75" cy="180" rx="25" ry="10" fill="#32CD32" transform="rotate(-20 75 180)" />
+        <ellipse cx="125" cy="200" rx="25" ry="10" fill="#32CD32" transform="rotate(20 125 200)" />
+       </g> <!-- Petals (kelopak) --> <g id="part-kelopak" onclick="playClick();showPart('Kelopak','Kelopak melindungi bunga saat masih kuncup 🌼')" class="cursor-pointer">
+        <ellipse cx="100" cy="125" rx="8" ry="5" fill="#228B22" />
+       </g> <!-- Crown (mahkota) --> <g id="part-mahkota" onclick="playClick();showPart('Mahkota Bunga','Mahkota bunga berwarna indah untuk menarik kupu-kupu 🦋')" class="cursor-pointer">
+        <ellipse cx="100" cy="80" rx="15" ry="28" fill="#FF69B4" />
+        <ellipse cx="72" cy="100" rx="15" ry="28" fill="#FF85C0" transform="rotate(-30 72 100)" />
+        <ellipse cx="128" cy="100" rx="15" ry="28" fill="#FF85C0" transform="rotate(30 128 100)" />
+        <ellipse cx="80" cy="70" rx="15" ry="25" fill="#FFB6C1" transform="rotate(-60 80 70)" />
+        <ellipse cx="120" cy="70" rx="15" ry="25" fill="#FFB6C1" transform="rotate(60 120 70)" />
+        <circle cx="100" cy="95" r="12" fill="#FFD700" />
+       </g>
+      </svg>
+     </div>
+     <div id="part-info" class="mt-4 text-center min-h-[60px] text-lg font-bold text-green-700">
+      👆 Sentuh bagian bunga untuk belajar!
+     </div>
+    </div>
+   </div><!-- PAGE: Merawat Tanaman -->
+   <div id="page-rawat" class="page flex-col items-center p-4 pt-16 relative z-10">
+    <button onclick="playClick();showPage('page-menu')" class="absolute top-3 left-3 bg-white/80 rounded-full p-2 shadow-lg"><i data-lucide="arrow-left" class="w-6 h-6 text-green-600"></i></button>
+    <h2 class="font-bubble text-2xl md:text-4xl text-white drop-shadow-lg mb-4">Cara Merawat Tanaman 💧</h2>
+    <div class="grid grid-cols-2 gap-4 max-w-lg w-full pb-8">
+     <div class="card-menu bg-blue-100 cursor-pointer" onclick="playClick();showCare(this,'💧 Menyiram bunga setiap hari agar tidak layu!')">
+      <div class="text-5xl mb-2 animate-float">
+       💧
+      </div>
+      <p class="font-bold text-blue-600">Menyiram</p>
+     </div>
+     <div class="card-menu bg-yellow-100 cursor-pointer" onclick="playClick();showCare(this,'☀️ Menjemur tanaman agar mendapat sinar matahari!')">
+      <div class="text-5xl mb-2 animate-float" style="animation-delay:0.5s">
+       ☀️
+      </div>
+      <p class="font-bold text-yellow-600">Menjemur</p>
+     </div>
+     <div class="card-menu bg-green-100 cursor-pointer" onclick="playClick();showCare(this,'🌿 Memberi pupuk agar tanaman tumbuh subur!')">
+      <div class="text-5xl mb-2 animate-float" style="animation-delay:1s">
+       🌿
+      </div>
+      <p class="font-bold text-green-600">Memberi Pupuk</p>
+     </div>
+     <div class="card-menu bg-pink-100 cursor-pointer" onclick="playClick();showCare(this,'🧹 Menjaga kebersihan taman dari sampah!')">
+      <div class="text-5xl mb-2 animate-float" style="animation-delay:1.5s">
+       🧹
+      </div>
+      <p class="font-bold text-pink-600">Membersihkan</p>
+     </div>
+    </div>
+    <div id="care-info" class="bg-white/90 rounded-2xl p-4 max-w-lg w-full text-center text-lg font-bold text-green-700 min-h-[60px]">
+     Sentuh gambar untuk belajar! 🌱
+    </div>
+   </div><!-- PAGE: Game Edukasi -->
+   <div id="page-game" class="page flex-col items-center p-4 pt-16 relative z-10">
+    <button onclick="playClick();showPage('page-menu')" class="absolute top-3 left-3 bg-white/80 rounded-full p-2 shadow-lg"><i data-lucide="arrow-left" class="w-6 h-6 text-green-600"></i></button>
+    <h2 class="font-bubble text-2xl md:text-4xl text-white drop-shadow-lg mb-4">Game Edukasi 🎮</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl w-full pb-8">
+     <div onclick="playClick();startCountGame()" class="card-menu bg-gradient-to-br from-orange-300 to-red-400 cursor-pointer">
+      <div class="text-4xl mb-2">
+       🔢
+      </div>
+      <p class="text-white font-bold">Hitung Bunga</p>
+     </div>
+     <div onclick="playClick();startMatchGame()" class="card-menu bg-gradient-to-br from-blue-300 to-purple-400 cursor-pointer">
+      <div class="text-4xl mb-2">
+       🧩
+      </div>
+      <p class="text-white font-bold">Pasangkan Nama</p>
+     </div>
+     <div onclick="playClick();startWaterGame()" class="card-menu bg-gradient-to-br from-green-300 to-teal-400 cursor-pointer">
+      <div class="text-4xl mb-2">
+       🚿
+      </div>
+      <p class="text-white font-bold">Siram Bunga</p>
+     </div>
+    </div><!-- Game Area -->
+    <div id="game-area" class="hidden bg-white/95 rounded-3xl p-6 max-w-lg w-full text-center"></div>
+   </div><!-- PAGE: Lagu -->
+   <div id="page-lagu" class="page flex-col items-center p-4 pt-16 relative z-10">
+    <button onclick="playClick();showPage('page-menu')" class="absolute top-3 left-3 bg-white/80 rounded-full p-2 shadow-lg"><i data-lucide="arrow-left" class="w-6 h-6 text-green-600"></i></button>
+    <h2 class="font-bubble text-2xl md:text-4xl text-white drop-shadow-lg mb-4">Lagu Anak 🎵</h2>
+    <div class="bg-white/90 rounded-3xl p-6 max-w-lg w-full">
+     <div class="text-center mb-4">
+      <div class="text-5xl mb-3 animate-sway">
+       🎶
+      </div>
+      <h3 class="font-bubble text-2xl text-pink-600">Lihat Kebunku</h3>
+     </div>
+     <div class="bg-yellow-50 rounded-2xl p-4 text-lg leading-relaxed text-gray-700">
+      <p>🌺 Lihat kebunku penuh dengan bunga</p>
+      <p>🌸 Ada yang putih dan ada yang merah</p>
+      <p>🌼 Setiap hari kusiram semua</p>
+      <p>🌻 Mawar melati semuanya indah</p>
+     </div>
+     <div class="mt-4 text-center">
+      <button onclick="playClick();singLagu()" class="btn-kid bg-gradient-to-r from-pink-400 to-red-400 text-white">🎤 Dengarkan</button>
+     </div>
+    </div>
+   </div><!-- PAGE: Video -->
+   <div id="page-video" class="page flex-col items-center p-4 pt-16 relative z-10">
+    <button onclick="playClick();showPage('page-menu')" class="absolute top-3 left-3 bg-white/80 rounded-full p-2 shadow-lg"><i data-lucide="arrow-left" class="w-6 h-6 text-green-600"></i></button>
+    <h2 class="font-bubble text-2xl md:text-4xl text-white drop-shadow-lg mb-4">Video Pembelajaran 📺</h2>
+    <div class="bg-white/90 rounded-3xl p-6 max-w-lg w-full text-center">
+     <div class="text-6xl mb-4 animate-float">
+      📺
+     </div>
+     <p class="text-lg text-gray-600 mb-4">Video pembelajaran tentang bunga akan ditampilkan oleh guru di kelas.</p>
+     <div class="bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl p-6">
+      <p class="text-5xl mb-2">🌸🎬🌺</p>
+      <p class="font-bold text-purple-600">Demo: Mengenal Bunga</p>
+      <p class="text-sm text-gray-500 mt-2">Konten video disediakan oleh guru</p>
+     </div>
+    </div>
+   </div><!-- PAGE: Profil Guru -->
+   <div id="page-profil" class="page flex-col items-center p-4 pt-16 relative z-10">
+    <button onclick="playClick();showPage('page-menu')" class="absolute top-3 left-3 bg-white/80 rounded-full p-2 shadow-lg"><i data-lucide="arrow-left" class="w-6 h-6 text-green-600"></i></button>
+    <h2 class="font-bubble text-2xl md:text-4xl text-white drop-shadow-lg mb-4">Profil Guru 👩‍🏫</h2><!-- Teacher Profile Card -->
+    <div class="bg-white/90 rounded-3xl p-6 max-w-sm w-full text-center mb-4">
+     <div class="w-24 h-24 bg-gradient-to-br from-pink-300 to-purple-400 rounded-full mx-auto mb-4 flex items-center justify-center text-5xl">
+      👩‍🏫
+     </div>
+     <h3 class="font-bubble text-2xl text-purple-600 mb-2">Guru PAUD</h3>
+     <p class="text-gray-600">Multimedia Pembelajaran Interaktif</p>
+     <p class="text-gray-500 text-sm mt-2">Tema: Tanaman - Sub Topik: Bunga</p>
+     <div class="mt-4 bg-green-50 rounded-xl p-3">
+      <p class="text-green-700 font-bold">🌱 "Belajar sambil bermain, anak-anak pasti senang!" 🌱</p>
+     </div>
+    </div><!-- Developer Profile Card -->
+    <div class="bg-white/90 rounded-3xl p-6 max-w-sm w-full text-center">
+     <div class="w-24 h-24 bg-gradient-to-br from-blue-300 to-cyan-400 rounded-full mx-auto mb-4 flex items-center justify-center text-5xl">
+      💻
+     </div>
+     <h3 class="font-bubble text-2xl text-blue-600 mb-2">Pengembang</h3>
+     <p class="text-gray-700 font-bold text-lg">Nurayn Silemab</p>
+     <p class="text-gray-600 text-sm mt-2">Web Developer &amp; Educator</p>
+     <div class="mt-4 bg-blue-50 rounded-xl p-3">
+      <p class="text-blue-700 font-bold text-sm">🚀 Menciptakan pengalaman belajar digital yang menyenangkan untuk anak-anak! 🚀</p>
+     </div>
+    </div>
+   </div><!-- Confetti container -->
+   <div id="confetti-container" class="fixed inset-0 pointer-events-none z-50"></div>
+  </div>
+  <script>
+    // Audio context for sounds
+    let audioCtx;
+    function getAudioCtx() {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        return audioCtx;
+    }
+    
+    function playClick() {
+        try {
+            const ctx = getAudioCtx();
+            const o = ctx.createOscillator();
+            const g = ctx.createGain();
+            o.connect(g); g.connect(ctx.destination);
+            o.frequency.value = 800;
+            o.type = 'sine';
+            g.gain.setValueAtTime(0.3, ctx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+            o.start(); o.stop(ctx.currentTime + 0.1);
+        } catch(e){}
+    }
+    
+    function playSuccess() {
+        try {
+            const ctx = getAudioCtx();
+            [523, 659, 784].forEach((f, i) => {
+                const o = ctx.createOscillator();
+                const g = ctx.createGain();
+                o.connect(g); g.connect(ctx.destination);
+                o.frequency.value = f; o.type = 'sine';
+                g.gain.setValueAtTime(0.2, ctx.currentTime + i*0.15);
+                g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i*0.15 + 0.3);
+                o.start(ctx.currentTime + i*0.15); o.stop(ctx.currentTime + i*0.15 + 0.3);
+            });
+        } catch(e){}
+    }
+    
+    function playWrong() {
+        try {
+            const ctx = getAudioCtx();
+            const o = ctx.createOscillator();
+            const g = ctx.createGain();
+            o.connect(g); g.connect(ctx.destination);
+            o.frequency.value = 200; o.type = 'sawtooth';
+            g.gain.setValueAtTime(0.2, ctx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+            o.start(); o.stop(ctx.currentTime + 0.3);
+        } catch(e){}
+    }
+
+    // Navigation
+    function showPage(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        const menuBtn = document.getElementById('splash-menu-btn');
+        if (id === 'page-splash') {
+            menuBtn.style.display = 'block';
+        } else {
+            menuBtn.style.display = 'none';
+        }
+        if (id === 'page-warna') initWarnaGame();
+        lucide.createIcons();
+    }
+
+    // Flower detail
+    function showFlower(name, emoji, desc) {
+        document.getElementById('flower-emoji').textContent = emoji;
+        document.getElementById('flower-name').textContent = name;
+        document.getElementById('flower-desc').textContent = desc;
+        document.getElementById('flower-modal').classList.remove('hidden');
+        speakText('Ini bunga ' + name);
+    }
+
+    // Parts
+    function showPart(name, desc) {
+        document.getElementById('part-info').innerHTML = `<span class="text-2xl">${name}</span><br>${desc}`;
+        speakText(name + '. ' + desc.replace(/[🌍🌿🍃🌼🦋]/g,''));
+    }
+
+    // Care
+    function showCare(el, text) {
+        document.getElementById('care-info').textContent = text;
+    }
+
+    // TTS
+    function speakText(text) {
+        if ('speechSynthesis' in window) {
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = 'id-ID'; u.rate = 0.8;
+            speechSynthesis.speak(u);
+        }
+    }
+
+    // Warna Game
+    const warnaData = [
+        {name:'Merah',color:'#EF4444',emoji:'🌹'},
+        {name:'Kuning',color:'#EAB308',emoji:'🌻'},
+        {name:'Putih',color:'#F9FAFB',emoji:'⚪'},
+        {name:'Ungu',color:'#A855F7',emoji:'🪻'},
+        {name:'Pink',color:'#EC4899',emoji:'🌸'},
+        {name:'Oranye',color:'#F97316',emoji:'🌺'}
+    ];
+    let warnaScore = 0, warnaTarget = null;
+
+    function initWarnaGame() {
+        warnaScore = 0;
+        document.getElementById('warna-score').textContent = '0';
+        nextWarnaRound();
+    }
+
+    function nextWarnaRound() {
+        warnaTarget = warnaData[Math.floor(Math.random() * warnaData.length)];
+        document.getElementById('target-color').textContent = warnaTarget.name;
+        document.getElementById('target-color').style.color = warnaTarget.color;
+        document.getElementById('warna-feedback').textContent = '';
+        
+        let options = [warnaTarget];
+        while (options.length < 3) {
+            const r = warnaData[Math.floor(Math.random() * warnaData.length)];
+            if (!options.find(o => o.name === r.name)) options.push(r);
+        }
+        options.sort(() => Math.random() - 0.5);
+        
+        const container = document.getElementById('warna-options');
+        container.innerHTML = options.map(o => `
+            <div onclick="checkWarna('${o.name}')" class="p-4 rounded-2xl cursor-pointer border-4 border-gray-200 hover:border-yellow-400 transition-all text-center" style="background:${o.color}20">
+                <div class="text-4xl">${o.emoji}</div>
+            </div>
+        `).join('');
+    }
+
+    function checkWarna(name) {
+        const fb = document.getElementById('warna-feedback');
+        if (name === warnaTarget.name) {
+            warnaScore++;
+            document.getElementById('warna-score').textContent = warnaScore;
+            fb.textContent = '⭐ Benar! Hebat! ⭐';
+            fb.style.color = '#16A34A';
+            playSuccess();
+            showConfetti();
+            setTimeout(nextWarnaRound, 1500);
+        } else {
+            fb.textContent = '❌ Coba lagi ya!';
+            fb.style.color = '#DC2626';
+            playWrong();
+        }
+    }
+
+    // Games
+    function startCountGame() {
+        const area = document.getElementById('game-area');
+        area.classList.remove('hidden');
+        const count = Math.floor(Math.random() * 5) + 1;
+        const flowers = '🌸'.repeat(count);
+        area.innerHTML = `
+            <h3 class="font-bubble text-2xl text-purple-600 mb-4">Hitung Bunganya! 🔢</h3>
+            <div class="text-5xl mb-4 tracking-wider">${flowers}</div>
+            <p class="text-lg mb-4">Ada berapa bunga?</p>
+            <div class="flex justify-center gap-3 flex-wrap">
+                ${[1,2,3,4,5].map(n => `<button onclick="checkCount(${n},${count})" class="btn-kid bg-gradient-to-r from-orange-300 to-orange-500 text-white text-2xl w-14 h-14 p-0 flex items-center justify-center">${n}</button>`).join('')}
+            </div>
+            <div id="count-fb" class="mt-4 text-xl font-bold min-h-[30px]"></div>
+        `;
+    }
+
+    function checkCount(ans, correct) {
+        const fb = document.getElementById('count-fb');
+        if (ans === correct) {
+            fb.textContent = '🎉 Benar! Pintar sekali!';
+            fb.style.color = '#16A34A';
+            playSuccess(); showConfetti();
+            setTimeout(startCountGame, 2000);
+        } else {
+            fb.textContent = '😊 Coba hitung lagi!';
+            fb.style.color = '#DC2626';
+            playWrong();
+        }
+    }
+
+    function startMatchGame() {
+        const area = document.getElementById('game-area');
+        area.classList.remove('hidden');
+        const pairs = [{n:'Mawar',e:'🌹'},{n:'Matahari',e:'🌻'},{n:'Tulip',e:'🌷'}];
+        const shuffled = [...pairs].sort(() => Math.random() - 0.5);
+        area.innerHTML = `
+            <h3 class="font-bubble text-2xl text-blue-600 mb-4">Pasangkan Nama! 🧩</h3>
+            <div class="grid grid-cols-2 gap-3">
+                <div>${shuffled.map(p => `<div class="p-3 bg-pink-100 rounded-xl mb-2 text-2xl cursor-pointer" onclick="selectMatch(this,'${p.n}')">${p.e}</div>`).join('')}</div>
+                <div>${pairs.map(p => `<div class="p-3 bg-blue-100 rounded-xl mb-2 font-bold cursor-pointer" onclick="selectMatch(this,'${p.n}')">${p.n}</div>`).join('')}</div>
+            </div>
+            <div id="match-fb" class="mt-4 text-xl font-bold min-h-[30px]"></div>
+        `;
+        window.matchSelection = null;
+    }
+
+    function selectMatch(el, val) {
+        if (!window.matchSelection) {
+            window.matchSelection = val;
+            el.style.border = '3px solid gold';
+        } else {
+            if (window.matchSelection === val) {
+                el.style.background = '#BBF7D0';
+                playSuccess();
+                document.getElementById('match-fb').textContent = '✅ Cocok!';
+            } else {
+                playWrong();
+                document.getElementById('match-fb').textContent = '🔄 Coba lagi!';
+            }
+            document.querySelectorAll('#game-area [style*="border"]').forEach(e => e.style.border = '');
+            window.matchSelection = null;
+        }
+    }
+
+    function startWaterGame() {
+        const area = document.getElementById('game-area');
+        area.classList.remove('hidden');
+        area.innerHTML = `
+            <h3 class="font-bubble text-2xl text-teal-600 mb-4">Siram Bunga! 🚿</h3>
+            <p class="mb-3">Tekan tombol siram untuk menyirami bunga!</p>
+            <div id="water-flower" class="text-6xl transition-all duration-500" style="filter:grayscale(100%)">🌸</div>
+            <div class="mt-2 bg-gray-200 rounded-full h-4 w-48 mx-auto overflow-hidden">
+                <div id="water-bar" class="h-full bg-blue-400 rounded-full transition-all" style="width:0%"></div>
+            </div>
+            <button onclick="waterFlower()" class="btn-kid bg-blue-400 text-white mt-4">💧 Siram!</button>
+            <div id="water-fb" class="mt-2 text-lg font-bold min-h-[30px]"></div>
+        `;
+        window.waterLevel = 0;
+    }
+
+    function waterFlower() {
+        window.waterLevel = Math.min(100, (window.waterLevel || 0) + 20);
+        document.getElementById('water-bar').style.width = window.waterLevel + '%';
+        const flower = document.getElementById('water-flower');
+        flower.style.filter = `grayscale(${100 - window.waterLevel}%)`;
+        flower.style.transform = `scale(${0.8 + window.waterLevel * 0.004})`;
+        playClick();
+        if (window.waterLevel >= 100) {
+            document.getElementById('water-fb').textContent = '🌺 Bunga mekar! Anak hebat! 🎉';
+            playSuccess(); showConfetti();
+        }
+    }
+
+    // Confetti
+    function showConfetti() {
+        const c = document.getElementById('confetti-container');
+        const colors = ['#FF69B4','#FFD700','#00CED1','#FF6347','#9B59B6','#2ECC71'];
+        for (let i = 0; i < 30; i++) {
+            const d = document.createElement('div');
+            d.style.cssText = `position:absolute;top:-10px;left:${Math.random()*100}%;width:10px;height:10px;background:${colors[i%colors.length]};border-radius:${Math.random()>0.5?'50%':'2px'};animation:confetti ${1+Math.random()}s ease-out forwards;animation-delay:${Math.random()*0.5}s;`;
+            c.appendChild(d);
+        }
+        setTimeout(() => c.innerHTML = '', 2500);
+    }
+
+    // Lagu
+    function singLagu() {
+        speakText('Lihat kebunku, penuh dengan bunga. Ada yang putih, dan ada yang merah. Setiap hari, kusiram semua. Mawar melati, semuanya indah.');
+    }
+
+    // Element SDK
+    const defaultConfig = {
+        main_title: 'Belajar Mengenal Bunga',
+        subtitle: 'Petualangan Seru di Taman Bunga!',
+        background_color: '#87CEEB',
+        surface_color: '#FFFFFF',
+        text_color: '#FFFFFF',
+        primary_action_color: '#EC4899',
+        secondary_action_color: '#22C55E',
+        font_family: 'Bubblegum Sans',
+        font_size: 16
+    };
+
+    window.elementSdk.init({
+        defaultConfig,
+        onConfigChange: async (config) => {
+            const title = document.getElementById('main-title');
+            const subtitle = document.getElementById('subtitle-text');
+            if (title) title.textContent = config.main_title || defaultConfig.main_title;
+            if (subtitle) subtitle.textContent = config.subtitle || defaultConfig.subtitle;
+            
+            const app = document.getElementById('app');
+            if (app) app.style.background = `linear-gradient(180deg, ${config.background_color || defaultConfig.background_color} 0%, #98FB98 70%, #228B22 100%)`;
+            
+            const font = config.font_family || defaultConfig.font_family;
+            document.querySelectorAll('.font-bubble').forEach(el => el.style.fontFamily = `${font}, cursive`);
+            
+            const size = config.font_size || defaultConfig.font_size;
+            document.querySelectorAll('.font-bubble').forEach(el => {
+                if (el.tagName === 'H1') el.style.fontSize = `${size * 2.5}px`;
+                else if (el.tagName === 'H2') el.style.fontSize = `${size * 2}px`;
+                else if (el.tagName === 'H3') el.style.fontSize = `${size * 1.5}px`;
+            });
+        },
+        mapToCapabilities: (config) => ({
+            recolorables: [
+                { get: () => config.background_color || defaultConfig.background_color, set: (v) => { config.background_color = v; window.elementSdk.setConfig({background_color:v}); }},
+                { get: () => config.surface_color || defaultConfig.surface_color, set: (v) => { config.surface_color = v; window.elementSdk.setConfig({surface_color:v}); }},
+                { get: () => config.text_color || defaultConfig.text_color, set: (v) => { config.text_color = v; window.elementSdk.setConfig({text_color:v}); }},
+                { get: () => config.primary_action_color || defaultConfig.primary_action_color, set: (v) => { config.primary_action_color = v; window.elementSdk.setConfig({primary_action_color:v}); }},
+                { get: () => config.secondary_action_color || defaultConfig.secondary_action_color, set: (v) => { config.secondary_action_color = v; window.elementSdk.setConfig({secondary_action_color:v}); }}
+            ],
+            borderables: [],
+            fontEditable: { get: () => config.font_family || defaultConfig.font_family, set: (v) => { config.font_family = v; window.elementSdk.setConfig({font_family:v}); }},
+            fontSizeable: { get: () => config.font_size || defaultConfig.font_size, set: (v) => { config.font_size = v; window.elementSdk.setConfig({font_size:v}); }}
+        }),
+        mapToEditPanelValues: (config) => new Map([
+            ['main_title', config.main_title || defaultConfig.main_title],
+            ['subtitle', config.subtitle || defaultConfig.subtitle]
+        ])
+    });
+
+    lucide.createIcons();
+</script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9fdf6f45d7bcb5dc',t:'MTc3OTE1NTI1Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
